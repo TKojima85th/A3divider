@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: a3-pdf-splitter
+    runtime: python3
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: FLASK_ENV
+        value: production
+    scaling:
+      minInstances: 1
+      maxInstances: 1

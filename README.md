@@ -18,7 +18,9 @@ A3サイズのPDFをA4サイズに分割・並び替えするWebアプリケー�
 - 任意のページ数に対応（4の倍数推奨）
 - 自動ページ数検出または手動指定
 
-## 🚀 デモ
+## 🚀 ライブデモ
+
+**🌐 [A3→A4 PDF分割ツール](https://your-app-name.onrender.com)** (Render でホスト中)
 
 ![デモ画像](https://via.placeholder.com/800x600/667eea/ffffff?text=A3%E2%86%92A4+PDF%E5%88%86%E5%89%B2%E3%83%84%E3%83%BC%E3%83%AB)
 
@@ -47,6 +49,49 @@ python app.py
 ```
 
 ブラウザで http://127.0.0.1:5000 にアクセス
+
+## 🌐 Renderへのデプロイ
+
+### 手順
+
+1. **GitHubリポジトリの準備**
+   ```bash
+   git push origin main
+   ```
+
+2. **Render ダッシュボードでの設定**
+   - [Render](https://render.com) にサインアップ/ログイン
+   - "New Web Service" を選択
+   - GitHubリポジトリを接続
+
+3. **デプロイ設定**
+   ```yaml
+   # render.yaml ファイルが自動的に検出されます
+   Build Command: pip install -r requirements.txt
+   Start Command: gunicorn app:app
+   ```
+
+4. **環境変数の設定**
+   - `SECRET_KEY`: ランダムな文字列（セキュリティ用）
+   - `FLASK_ENV`: `production`
+
+5. **デプロイ実行**
+   - "Create Web Service" をクリック
+   - 自動的にビルドとデプロイが開始されます
+
+### Render デプロイの特徴
+
+✅ **無料プラン利用可能**
+✅ **自動HTTPS対応** (PWA要件)
+✅ **Git連携** 自動デプロイ
+✅ **カスタムドメイン対応**
+✅ **高可用性インフラ**
+
+### デプロイ後の確認
+
+- PWAインストールプロンプトの表示
+- オフライン機能の動作
+- モバイルデバイスでの動作確認
 
 ## 📱 PWA対応
 
