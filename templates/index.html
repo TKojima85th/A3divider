@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A3→A4 PDF分割ツール</title>
+    <meta name="description" content="A3サイズのPDFをA4サイズに分割・並び替えするWebアプリケーション">
+    <meta name="keywords" content="PDF,分割,A3,A4,製本,復元,変換">
+    <meta name="author" content="A3→A4 PDF分割ツール">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='icons/icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/icon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/icon-16x16.png') }}">
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-navbutton-color" content="#667eea">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="PDF分割">
+
+    <!-- Windows PWA Meta Tags -->
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/icon-144x144.png') }}">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -36,19 +64,60 @@
                     <p class="file-info" id="fileInfo"></p>
                 </div>
 
-                <div class="options">
-                    <h3>オプション設定</h3>
-                    <div class="option-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="vertical" id="vertical">
-                            <span>縦書きモード（右→左の順序）</span>
+                <div class="mode-selection">
+                    <h3>処理モード</h3>
+                    <div class="mode-group">
+                        <label class="mode-label">
+                            <input type="radio" name="mode" value="simple" id="modeSimple" checked>
+                            <div class="mode-card">
+                                <div class="mode-icon">📄</div>
+                                <div class="mode-title">シンプル分割</div>
+                                <div class="mode-description">A3を左右に分割してA4を2ページ作成</div>
+                            </div>
+                        </label>
+                        <label class="mode-label">
+                            <input type="radio" name="mode" value="booklet" id="modeBooklet">
+                            <div class="mode-card">
+                                <div class="mode-icon">📖</div>
+                                <div class="mode-title">製本復元</div>
+                                <div class="mode-description">中綴じ製本をスキャンしたPDFを正しいページ順に復元</div>
+                            </div>
                         </label>
                     </div>
-                    <div class="option-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="rotate" id="rotate">
-                            <span>90度回転</span>
-                        </label>
+                </div>
+
+                <div class="options">
+                    <h3>オプション設定</h3>
+
+                    <!-- Simple mode options -->
+                    <div class="simple-options" id="simpleOptions">
+                        <div class="option-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="vertical" id="vertical">
+                                <span>縦書きモード（右→左の順序）</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Booklet mode options -->
+                    <div class="booklet-options" id="bookletOptions" style="display: none;">
+                        <div class="option-group">
+                            <label class="input-label">
+                                <span>総A4ページ数（空白で自動検出）</span>
+                                <input type="number" name="total_pages" id="totalPages" min="4" step="4" placeholder="32">
+                                <small>※4の倍数で入力してください</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Common options -->
+                    <div class="common-options">
+                        <div class="option-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="rotate" id="rotate">
+                                <span>90度回転</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -64,17 +133,32 @@
                 <h3>使い方</h3>
                 <ol>
                     <li>A3サイズのPDFファイルを選択またはドラッグ＆ドロップ</li>
+                    <li>処理モードを選択（シンプル分割 or 製本復元）</li>
                     <li>必要に応じてオプションを設定</li>
                     <li>「PDFを分割」ボタンをクリック</li>
-                    <li>分割されたA4サイズのPDFがダウンロードされます</li>
+                    <li>処理されたA4サイズのPDFがダウンロードされます</li>
                 </ol>
+
+                <h3>処理モード説明</h3>
+                <div class="mode-info">
+                    <div class="mode-detail">
+                        <h4>📄 シンプル分割</h4>
+                        <p>A3ページを単純に左右に分割してA4ページを作成します。</p>
+                        <p>例: A3ページ1 → A4ページ1,2</p>
+                    </div>
+                    <div class="mode-detail">
+                        <h4>📖 製本復元</h4>
+                        <p>中綴じ製本されたA3資料をスキャンしたPDFを、元の読み順に復元します。</p>
+                        <p>例: ホッチキス製本された冊子のページ順を正しく並び替え</p>
+                    </div>
+                </div>
 
                 <h3>仕様</h3>
                 <ul>
                     <li>最大ファイルサイズ: 50MB</li>
                     <li>対応形式: PDFのみ</li>
                     <li>A3の1ページ → A4の2ページに分割</li>
-                    <li>ページ順序: 左→右（縦書きモードでは右→左）</li>
+                    <li>製本復元モードでは任意のページ数に対応（4の倍数推奨）</li>
                 </ul>
             </div>
         </main>
@@ -91,6 +175,24 @@
         const uploadArea = document.getElementById('uploadArea');
         const uploadForm = document.getElementById('uploadForm');
         const spinner = document.getElementById('spinner');
+        const modeSimple = document.getElementById('modeSimple');
+        const modeBooklet = document.getElementById('modeBooklet');
+        const simpleOptions = document.getElementById('simpleOptions');
+        const bookletOptions = document.getElementById('bookletOptions');
+
+        // Mode switching
+        function toggleModeOptions() {
+            if (modeBooklet.checked) {
+                simpleOptions.style.display = 'none';
+                bookletOptions.style.display = 'block';
+            } else {
+                simpleOptions.style.display = 'block';
+                bookletOptions.style.display = 'none';
+            }
+        }
+
+        modeSimple.addEventListener('change', toggleModeOptions);
+        modeBooklet.addEventListener('change', toggleModeOptions);
 
         // File selection
         fileInput.addEventListener('change', function(e) {
@@ -143,6 +245,69 @@
             else if (bytes < 1048576) return Math.round(bytes / 1024) + ' KB';
             else return Math.round(bytes / 1048576) + ' MB';
         }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install button/banner
+            showInstallPromotion();
+        });
+
+        function showInstallPromotion() {
+            // Create install banner
+            const installBanner = document.createElement('div');
+            installBanner.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; text-align: center; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                    <span style="margin-right: 15px;">📱 このアプリをホーム画面に追加できます</span>
+                    <button id="installBtn" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; margin-right: 10px;">インストール</button>
+                    <button id="dismissBtn" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 20px; cursor: pointer;">後で</button>
+                </div>
+            `;
+
+            document.body.appendChild(installBanner);
+
+            // Install button click handler
+            document.getElementById('installBtn').addEventListener('click', () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        }
+                        deferredPrompt = null;
+                        installBanner.remove();
+                    });
+                }
+            });
+
+            // Dismiss button click handler
+            document.getElementById('dismissBtn').addEventListener('click', () => {
+                installBanner.remove();
+            });
+        }
+
+        // PWA Install Success
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA was installed');
+        });
     </script>
 </body>
 </html>
