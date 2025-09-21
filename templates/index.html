@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A3→A4 PDF分割ツール</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 A3→A4 PDF分割ツール</h1>
+            <p class="subtitle">A3サイズのPDFをA4サイズ2ページに分割します</p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <main>
+            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📤</div>
+                    <p class="upload-text">PDFファイルをドラッグ＆ドロップ</p>
+                    <p class="upload-text-sub">または</p>
+                    <label for="fileInput" class="file-label">
+                        ファイルを選択
+                    </label>
+                    <input type="file" name="file" id="fileInput" accept=".pdf" required>
+                    <p class="file-info" id="fileInfo"></p>
+                </div>
+
+                <div class="options">
+                    <h3>オプション設定</h3>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vertical" id="vertical">
+                            <span>縦書きモード（右→左の順序）</span>
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="rotate" id="rotate">
+                            <span>90度回転</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="submit-area">
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                        <span class="btn-text">PDFを分割</span>
+                        <span class="spinner" id="spinner"></span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="info-section">
+                <h3>使い方</h3>
+                <ol>
+                    <li>A3サイズのPDFファイルを選択またはドラッグ＆ドロップ</li>
+                    <li>必要に応じてオプションを設定</li>
+                    <li>「PDFを分割」ボタンをクリック</li>
+                    <li>分割されたA4サイズのPDFがダウンロードされます</li>
+                </ol>
+
+                <h3>仕様</h3>
+                <ul>
+                    <li>最大ファイルサイズ: 50MB</li>
+                    <li>対応形式: PDFのみ</li>
+                    <li>A3の1ページ → A4の2ページに分割</li>
+                    <li>ページ順序: 左→右（縦書きモードでは右→左）</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2024 A3→A4 PDF分割ツール</p>
+        </footer>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadForm = document.getElementById('uploadForm');
+        const spinner = document.getElementById('spinner');
+
+        // File selection
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileInfo.textContent = `選択されたファイル: ${file.name} (${formatFileSize(file.size)})`;
+                submitBtn.disabled = false;
+                uploadArea.classList.add('has-file');
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.type === 'application/pdf') {
+                    fileInput.files = e.dataTransfer.files;
+                    fileInfo.textContent = `選択されたファイル: ${file.name} (${formatFileSize(file.size)})`;
+                    submitBtn.disabled = false;
+                    uploadArea.classList.add('has-file');
+                } else {
+                    alert('PDFファイルのみアップロード可能です');
+                }
+            }
+        });
+
+        // Form submission
+        uploadForm.addEventListener('submit', function(e) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('loading');
+            spinner.style.display = 'inline-block';
+        });
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            else if (bytes < 1048576) return Math.round(bytes / 1024) + ' KB';
+            else return Math.round(bytes / 1048576) + ' MB';
+        }
+    </script>
+</body>
+</html>
